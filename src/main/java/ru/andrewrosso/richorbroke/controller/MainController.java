@@ -27,21 +27,27 @@ public class MainController {
     private String brokeTag;
     @Value("${giphy.identical}")
     private String identicalTag;
+    @Value("${giphy.error}")
+    private String errorTag;
 
     @GetMapping("/gif")
     public GifModel getGif(@RequestParam String currencyCode) {
         Compare gifKey = openExchangeRatesService.getCompareCurrencyRates(currencyCode);
-        String gifTag = "";
-        switch (gifKey) {
-            case HIGHER:
-                gifTag = richTag;
-                break;
-            case LOWER:
-                gifTag = brokeTag;
-                break;
-            case IDENTICAL:
-                gifTag = identicalTag;
-                break;
+        String gifTag = errorTag;
+        try {
+            switch (gifKey) {
+                case HIGHER:
+                    gifTag = richTag;
+                    break;
+                case LOWER:
+                    gifTag = brokeTag;
+                    break;
+                case IDENTICAL:
+                    gifTag = identicalTag;
+                    break;
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Compare result is null!");
         }
         return giphyService.getGif(gifTag);
     }
