@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ru.andrewrosso'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 sourceCompatibility = '1.8'
 
 configurations {
@@ -35,5 +35,14 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+task copyJarToRoot {
+    doLast {
+        copy {
+            from './build/libs/RichOrBroke-0.0.1.jar'
+            into "./"
+        }
     }
 }
