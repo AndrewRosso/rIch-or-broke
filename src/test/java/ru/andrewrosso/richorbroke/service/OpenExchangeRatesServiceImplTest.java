@@ -80,7 +80,7 @@ public class OpenExchangeRatesServiceImplTest {
         Mockito.when(openExchangeRatesClient.getHistoricalCurrencyRates(any(), any(), any()))
                 .thenReturn(testYesterdayRates);
 
-        openExchangeRatesService.updateCurrencyRates();
+        openExchangeRatesService.checkAndUpdateCurrencyRates();
 
         assertEquals(testActualRates, openExchangeRatesService.getActualRates());
         assertEquals(testYesterdayRates, openExchangeRatesService.getYesterdayRates());
@@ -91,7 +91,7 @@ public class OpenExchangeRatesServiceImplTest {
         openExchangeRatesService.setActualRates(testActualRates);
         openExchangeRatesService.setClockUTC(Clock.fixed(Instant.parse(FIXED_CURRENT_TIME), ZoneId.of("UTC")));
 
-        openExchangeRatesService.updateCurrencyRates();
+        openExchangeRatesService.checkAndUpdateCurrencyRates();
 
         assertEquals(testActualRates, openExchangeRatesService.getActualRates());
     }
@@ -101,7 +101,7 @@ public class OpenExchangeRatesServiceImplTest {
         openExchangeRatesService.setYesterdayRates(testYesterdayRates);
         openExchangeRatesService.setClockUTC(Clock.fixed(Instant.parse(FIXED_CURRENT_DAY), ZoneId.of("UTC")));
 
-        openExchangeRatesService.updateCurrencyRates();
+        openExchangeRatesService.checkAndUpdateCurrencyRates();
 
         assertEquals(testYesterdayRates, openExchangeRatesService.getYesterdayRates());
     }
@@ -149,8 +149,10 @@ public class OpenExchangeRatesServiceImplTest {
 
     @Test
     public void shouldReturnCompareHigherWhenActualCurrencyRateHigherThanYesterday() {
-        openExchangeRatesService.setActualRates(testActualRates);
-        openExchangeRatesService.setYesterdayRates(testYesterdayRates);
+        Mockito.when(openExchangeRatesClient.getLatestCurrencyRates(any(), any()))
+                .thenReturn(testActualRates);
+        Mockito.when(openExchangeRatesClient.getHistoricalCurrencyRates(any(), any(), any()))
+                .thenReturn(testYesterdayRates);
 
         Compare actualResult = openExchangeRatesService.getCompareCurrencyRates("RUB");
         assertEquals(HIGHER, actualResult);
@@ -158,8 +160,10 @@ public class OpenExchangeRatesServiceImplTest {
 
     @Test
     public void shouldReturnCompareLowerWhenActualCurrencyRateLowerThanYesterday() {
-        openExchangeRatesService.setActualRates(testActualRates);
-        openExchangeRatesService.setYesterdayRates(testYesterdayRates);
+        Mockito.when(openExchangeRatesClient.getLatestCurrencyRates(any(), any()))
+                .thenReturn(testActualRates);
+        Mockito.when(openExchangeRatesClient.getHistoricalCurrencyRates(any(), any(), any()))
+                .thenReturn(testYesterdayRates);
 
         Compare actualResult = openExchangeRatesService.getCompareCurrencyRates("SOL");
         assertEquals(LOWER, actualResult);
@@ -167,8 +171,10 @@ public class OpenExchangeRatesServiceImplTest {
 
     @Test
     public void shouldReturnCompareIdenticalWhenActualCurrencyRateIdenticalAtTheYesterday() {
-        openExchangeRatesService.setActualRates(testActualRates);
-        openExchangeRatesService.setYesterdayRates(testYesterdayRates);
+        Mockito.when(openExchangeRatesClient.getLatestCurrencyRates(any(), any()))
+                .thenReturn(testActualRates);
+        Mockito.when(openExchangeRatesClient.getHistoricalCurrencyRates(any(), any(), any()))
+                .thenReturn(testYesterdayRates);
 
         Compare actualResult = openExchangeRatesService.getCompareCurrencyRates("TUR");
         assertEquals(IDENTICAL, actualResult);
