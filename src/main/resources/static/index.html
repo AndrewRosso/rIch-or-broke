@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="./main.js"></script>
+    <title>RichOrBroke</title>
+</head>
+
+<body>
+
+<div style="text-align: center;">
+    <span>Выберете код валюты</span>
+    <select id="codes_select" size="1"> </select>
+    <button id="btn" onclick='loadResultGif()'>PUSH THE BUTTON</button>
+    <div id="out"></div>
+</div>
+
+<script>
+    $(loadCodeForSelect());
+</script>
+
+</body>
+</html>
