@@ -9,5 +9,5 @@ public interface OpenExchangeRatesService {
 
     Compare getCompareCurrencyRates(String currencyCode);
 
-    void updateCurrencyRates();
+    void checkAndUpdateCurrencyRates();
 }

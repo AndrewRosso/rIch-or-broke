@@ -43,6 +43,8 @@ public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
 
     @Override
     public Compare getCompareCurrencyRates(String currencyCode) {
+        checkAndUpdateCurrencyRates();
+
         Double currentValue = getCurrencyValue(actualRates, currencyCode);
         Double yesterdayValue = getCurrencyValue(yesterdayRates, currencyCode);
 
@@ -66,13 +68,13 @@ public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
     }
 
     @Override
-    public void updateCurrencyRates() {
+    public void checkAndUpdateCurrencyRates() {
         Instant currentTime = Instant.now(clockUTC);
-        updateActualRates(currentTime);
-        updateYesterdayRates(currentTime);
+        checkAndUpdateActualRates(currentTime);
+        checkAndUpdateYesterdayRates(currentTime);
     }
 
-    private void updateActualRates(Instant time) {
+    private void checkAndUpdateActualRates(Instant time) {
         if (actualRates == null
                 || !dateWithHourFormatterUTC(Instant.ofEpochSecond(actualRates.getTimestamp()))
                 .equals(dateWithHourFormatterUTC(time))) {
@@ -80,7 +82,7 @@ public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
         }
     }
 
-    private void updateYesterdayRates(Instant time) {
+    private void checkAndUpdateYesterdayRates(Instant time) {
         if (yesterdayRates == null
                 || !dateFormatterUTC(Instant.ofEpochSecond(yesterdayRates.getTimestamp()))
                 .equals(getYesterdayDate(time))) {
