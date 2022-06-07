@@ -1,6 +1,6 @@
 package ru.andrewrosso.richorbroke.service;
 
-import ru.andrewrosso.richorbroke.enums.Compare;
+import ru.andrewrosso.richorbroke.constant.Compare;
 
 import java.util.Set;
 
