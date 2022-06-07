@@ -1,23 +1,24 @@
 package ru.andrewrosso.richorbroke.service.impl;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.andrewrosso.richorbroke.client.FeignOpenExchangeRatesClient;
-import ru.andrewrosso.richorbroke.enums.Compare;
+import ru.andrewrosso.richorbroke.constant.Compare;
 import ru.andrewrosso.richorbroke.model.CurrencyRates;
 import ru.andrewrosso.richorbroke.service.OpenExchangeRatesService;
+import ru.andrewrosso.richorbroke.util.DateUtil;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 @Service
-@Data
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -53,17 +54,21 @@ public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
                 return Compare.HIGHER;
             case -1:
                 return Compare.LOWER;
-            default:
+            case 0:
                 return Compare.IDENTICAL;
+            default:
+                return Compare.ERROR;
         }
     }
 
     private Double getCurrencyValue(CurrencyRates currencyRates, String currencyCode) {
-        if (currencyRates == null
-                || currencyCode == null
-                || !currencyRates.getRates().containsKey(currencyCode)) {
-            throw new IllegalArgumentException();
+        if (currencyRates == null) {
+            throw new IllegalArgumentException("Currency Rates is illegal");
         }
+        if (currencyCode == null || !currencyRates.getRates().containsKey(currencyCode)) {
+            throw new IllegalArgumentException("Currency code is illegal");
+        }
+
         return currencyRates.getRates().get(currencyCode);
     }
 
@@ -75,38 +80,24 @@ public class OpenExchangeRatesServiceImpl implements OpenExchangeRatesService {
     }
 
     private void checkAndUpdateActualRates(Instant time) {
+        DateUtil dateHourUtil = new DateUtil(DATE_HOUR_PATTERN, HISTORICAL_REQUEST_ZONE_ID);
+
         if (actualRates == null
-                || !dateWithHourFormatterUTC(Instant.ofEpochSecond(actualRates.getTimestamp()))
-                .equals(dateWithHourFormatterUTC(time))) {
+                || !dateHourUtil.getFormattedDate(actualRates.getTimestamp())
+                .equals(dateHourUtil.getFormattedDate(time))) {
             actualRates = openExchangeRatesClient.getLatestCurrencyRates(appId, base);
         }
     }
 
     private void checkAndUpdateYesterdayRates(Instant time) {
+        DateUtil dateUtil = new DateUtil(DATE_PATTERN, HISTORICAL_REQUEST_ZONE_ID);
+        Instant yesterday = time.minus(1, ChronoUnit.DAYS);
+
         if (yesterdayRates == null
-                || !dateFormatterUTC(Instant.ofEpochSecond(yesterdayRates.getTimestamp()))
-                .equals(getYesterdayDate(time))) {
-            yesterdayRates = openExchangeRatesClient.getHistoricalCurrencyRates(getYesterdayDate(time), appId, base);
+                || !dateUtil.getFormattedDate(yesterdayRates.getTimestamp())
+                .equals(dateUtil.getFormattedDate(yesterday))) {
+            yesterdayRates = openExchangeRatesClient
+                    .getHistoricalCurrencyRates(dateUtil.getFormattedDate(yesterday), appId, base);
         }
-    }
-
-    private String getYesterdayDate(Instant time) {
-        Instant yesterdayInst = time.minus(1, ChronoUnit.DAYS);
-
-        return dateFormatterUTC(yesterdayInst);
-    }
-
-    private String dateFormatterUTC(Instant instant) {
-        DateTimeFormatter dateFormatter = DateTimeFormatter
-                .ofPattern(DATE_PATTERN)
-                .withZone(ZoneId.of(HISTORICAL_REQUEST_ZONE_ID));
-        return dateFormatter.format(instant);
-    }
-
-    private String dateWithHourFormatterUTC(Instant instant) {
-        DateTimeFormatter dateFormatter = DateTimeFormatter
-                .ofPattern(DATE_HOUR_PATTERN)
-                .withZone(ZoneId.of(HISTORICAL_REQUEST_ZONE_ID));
-        return dateFormatter.format(instant);
     }
 }
