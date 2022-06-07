@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.andrewrosso.richorbroke.dto.GifDTO;
-import ru.andrewrosso.richorbroke.enums.Compare;
+import ru.andrewrosso.richorbroke.constant.Compare;
 import ru.andrewrosso.richorbroke.model.GifModel;
 import ru.andrewrosso.richorbroke.service.impl.GiphyServiceImpl;
 import ru.andrewrosso.richorbroke.service.impl.OpenExchangeRatesServiceImpl;
@@ -34,13 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(MainController.class)
+@WebMvcTest(CurrencyGifController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class MainControllerTest {
+public class CurrencyGifControllerTest {
 
     private static final String RICH_TAG = "rich";
-    private static final String BROKE_TAG = "broke";
-    private static final String IDENTICAL_TAG = "identical";
     private static final String ERROR_TAG = "error";
 
     private static final String TEST_CODE = "testCode";
@@ -116,7 +114,7 @@ public class MainControllerTest {
     public void shouldGetGifByErrorTag() throws Exception {
         testGif.setGifTag(ERROR_TAG);
         Mockito.when(exchangeRatesService.getCompareCurrencyRates(any()))
-                .thenReturn(null);
+                .thenReturn(Compare.ERROR);
         Mockito.when(giphyService.getGif(ERROR_TAG))
                 .thenReturn(testGif);
 

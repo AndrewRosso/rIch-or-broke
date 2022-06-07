@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import ru.andrewrosso.richorbroke.client.FeignOpenExchangeRatesClient;
-import ru.andrewrosso.richorbroke.enums.Compare;
+import ru.andrewrosso.richorbroke.constant.Compare;
 import ru.andrewrosso.richorbroke.model.CurrencyRates;
 import ru.andrewrosso.richorbroke.service.impl.OpenExchangeRatesServiceImpl;
 
@@ -24,7 +24,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static ru.andrewrosso.richorbroke.enums.Compare.*;
+import static ru.andrewrosso.richorbroke.constant.Compare.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OpenExchangeRatesServiceImplTest {
